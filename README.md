@@ -39,7 +39,7 @@ mkdir -p exp
 conda create -n letr python anaconda
 conda activate letr
 conda install -c pytorch pytorch torchvision
-conda install cython scipy
+conda install cython scipy opencv
 pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
 pip install docopt
 ```
