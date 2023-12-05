@@ -18,8 +18,10 @@ In this paper, we present a joint end-to-end line segment detection algorithm us
 
 | Name | sAP10 | sAP15 | sF10 | sF15 | URL|
 | --- | --- | --- | --- | --- |--- |
-| Wireframe | 65.6 | 68.0 | 66.1 | 67.4 | [LETR-R101](https://vcl.ucsd.edu/letr/checkpoints/res101/res101_stage2_focal.zip) |
-| YorkUrban | 29.6 | 32.0 | 40.5 | 42.1 | [LETR-R50](https://vcl.ucsd.edu/letr/checkpoints/res50/res50_stage2_focal.zip) |
+| Wireframe | **65.6** | **68.0** | **66.1** | **67.4** | [LETR-R101](https://vcl.ucsd.edu/letr/checkpoints/res101/res101_stage2_focal.zip) |
+| Wireframe |   64.6   |   67.3   |   64.8   |   66.2   | [LETR-R50](https://vcl.ucsd.edu/letr/checkpoints/res50/res50_stage2_focal.zip) |
+| YorkUrban |   27.5   |   29.6   |   39.4   |   40.9   | [LETR-R101](https://vcl.ucsd.edu/letr/checkpoints/res101/res101_stage2_focal.zip) |
+| YorkUrban | **29.4** | **31.7** | **40.3** | **42.0** | [LETR-R50](https://vcl.ucsd.edu/letr/checkpoints/res50/res50_stage2_focal.zip) |
 
 ## Reproducing Results
 
