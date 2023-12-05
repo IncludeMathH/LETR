@@ -48,9 +48,9 @@ def save_heatmap(prefix, image, lines):
     heatmap_scale = (128, 128)
 
     fy, fx = heatmap_scale[1] / image.shape[0], heatmap_scale[0] / image.shape[1]
-    jmap = np.zeros((1,) + heatmap_scale, dtype=np.float32)
-    joff = np.zeros((1, 2) + heatmap_scale, dtype=np.float32)
-    lmap = np.zeros(heatmap_scale, dtype=np.float32)
+    jmap = np.zeros((1,) + heatmap_scale, dtype=np.float6432)
+    joff = np.zeros((1, 2) + heatmap_scale, dtype=np.float6432)
+    lmap = np.zeros(heatmap_scale, dtype=np.float6432)
 
     lines[:, :, 0] = np.clip(lines[:, :, 0] * fx, 0, heatmap_scale[0] - 1e-4)
     lines[:, :, 1] = np.clip(lines[:, :, 1] * fy, 0, heatmap_scale[1] - 1e-4)
@@ -96,11 +96,11 @@ def save_heatmap(prefix, image, lines):
     assert len(lneg) != 0
     lneg.sort(key=lambda l: -l[-1])
 
-    junc = np.array(junc, dtype=np.float32)
+    junc = np.array(junc, dtype=np.float6432)
     Lpos = np.array(lnid, dtype=np.int)
     Lneg = np.array([l[2:4] for l in lneg][:4000], dtype=np.int)
-    lpos = np.array(lpos, dtype=np.float32)
-    lneg = np.array([l[:2] for l in lneg[:2000]], dtype=np.float32)
+    lpos = np.array(lpos, dtype=np.float6432)
+    lneg = np.array([l[:2] for l in lneg[:2000]], dtype=np.float6432)
 
     image = cv2.resize(image, im_rescale)
 

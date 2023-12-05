@@ -30,18 +30,18 @@ git clone https://github.com/mlpc-ucsd/LETR.git
 
 ### Step2: Environment Installation
 
+Add tsinghua mirror channel to anaconda and pip according to [Anaconda 镜像使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/)、[PyPI 镜像使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/pypi/)
+
 ```bash
-mkdir -p data
-mkdir -p evaluation/data
-mkdir -p exp
+mkdir -p data evaluation/data exp
 
-
-conda create -n letr python anaconda
+conda create -n letr python=3.8 anaconda         # There is a constraint between the Python and PyTorch versions
 conda activate letr
-conda install -c pytorch pytorch torchvision
-conda install cython scipy opencv
+# conda install -c pytorch pytorch torchvision
+conda install cython opencv 
 pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
-pip install docopt
+pip install torch==1.8.0+cu111 torchvision==0.9.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+pip install -r requirements.txt
 ```
 
 ### Step3: Data Preparation
