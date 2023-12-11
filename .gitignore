@@ -17,3 +17,4 @@ data
 evaluation/data
 exp
 *zip
+src/inference.ipynb
