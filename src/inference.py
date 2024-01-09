@@ -1,11 +1,10 @@
 """
 LETR Basic Usage Demo
 """
-import torch, os, argparse
+import torch, os, argparse, glob
 import cv2
+from tqdm import tqdm
 
-import matplotlib.pyplot as plt
-plt.rcParams['figure.dpi'] = 200
 import torchvision.transforms.functional as functional
 import torch.nn.functional as F
 from models import build_model
@@ -95,51 +94,7 @@ class Resize(object):
         size = self.sizes
         return resize(img, size, self.max_size)
 
-
-def main():
-    args = parse_args()
-    # 指定输入图像
-    img_dir = args.img_dir
-    output_dir = args.output_dir
-    # obtain checkpoints
-    checkpoint = torch.load(args.ckpt_dir, map_location='cpu')
-
-    try:
-        os.makedirs(output_dir)
-    except OSError:
-        print(f'{output_dir} already exists')
-    else:
-        print(f'create folder in {output_dir}')
-        
-    # get image name and generate output image name
-    img_name = os.path.basename(img_dir)
-    output_img_name = 'res_' + img_name
-
-    # load model
-    args = checkpoint['args']
-    model, _, postprocessors = build_model(args)
-    model.load_state_dict(checkpoint['model'])
-    model.eval()
-
-    # load image
-    raw_img = plt.imread(img_dir)
-    h, w = raw_img.shape[0], raw_img.shape[1]
-    orig_size = torch.as_tensor([int(h), int(w)])
-
-    # normalize image
-    test_size = 1100
-    normalize = Compose([
-            ToTensor(),
-            Normalize([0.538, 0.494, 0.453], [0.257, 0.263, 0.273]),
-            Resize([test_size]),
-        ])
-    img = normalize(raw_img)
-    inputs = nested_tensor_from_tensor_list([img])
-
-    # Model Inference
-    with torch.no_grad():
-        outputs = model(inputs)[0]
-    
+def post_processing(outputs, orig_size):
     # Post-processing Results
     out_logits, out_line = outputs['pred_logits'], outputs['pred_lines']
     prob = F.softmax(out_logits, -1)
@@ -153,8 +108,12 @@ def main():
     keep = scores >= 0.7
     keep = keep.squeeze()
     lines = lines[keep]
+    if lines.numel() == 0:
+        return []
     lines = lines.reshape(lines.shape[0], -1)
+    return lines
 
+def visual_save(img_dir, lines, output_dir, output_img_name):
     # Plot Inference Results
     input_image = cv2.imread(img_dir)        
     for tp_id, line in enumerate(lines):
@@ -163,6 +122,60 @@ def main():
         p2 = (int(x2), int(y2))
         cv2.line(input_image, p1, p2, (0, 255, 0), 2)
     cv2.imwrite(os.path.join(output_dir, output_img_name), img=input_image)
+
+def main():
+    args = parse_args()
+    # 指定输入图像
+    imgs_dir = args.img_dir
+    output_dir = args.output_dir
+    # obtain checkpoints
+    checkpoint = torch.load(args.ckpt_dir, map_location='cpu')
+
+    try:
+        os.makedirs(output_dir)
+    except OSError:
+        print(f'{output_dir} already exists')
+    else:
+        print(f'create folder in {output_dir}')
+    
+    # load model
+    args = checkpoint['args']
+    model, _, postprocessors = build_model(args)
+    model.load_state_dict(checkpoint['model'])
+    model.eval()
+
+    # get image name and generate output image name
+    if os.path.isfile(imgs_dir):
+        imgs_dir = [imgs_dir]
+    elif os.path.isdir(imgs_dir):
+        imgs_dir = glob.glob(os.path.join(imgs_dir, '*'))
+    
+    for img_dir in tqdm(imgs_dir):
+        img_name = os.path.basename(img_dir)
+        output_img_name = 'res_' + img_name
+
+        # load image
+        raw_img = cv2.cvtColor(cv2.imread(img_dir), cv2.COLOR_BGR2RGB)
+        h, w = raw_img.shape[0], raw_img.shape[1]
+        orig_size = torch.as_tensor([int(h), int(w)])
+
+        # normalize image
+        test_size = 1100
+        normalize = Compose([
+                ToTensor(),
+                Normalize([0.538, 0.494, 0.453], [0.257, 0.263, 0.273]),
+                Resize([test_size]),
+            ])
+        img = normalize(raw_img)
+        inputs = nested_tensor_from_tensor_list([img])
+
+        # Model Inference
+        with torch.no_grad():
+            outputs = model(inputs)[0]
+
+        lines = post_processing(outputs=outputs, orig_size=orig_size)
+        visual_save(img_dir, lines, output_dir, output_img_name)
+
     print('output image has been saved!')
 
 

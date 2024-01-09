@@ -18,3 +18,4 @@ evaluation/data
 exp
 *zip
 src/inference.ipynb
+work_dirs/
